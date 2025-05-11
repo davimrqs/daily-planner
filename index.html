@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Document</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- CSS e JS do Bootstrap -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" defer>
+    <script src="assets/js/bootstrap.bundle.min.js" defer></script>
 
     <!-- CSS e JS do projeto -->
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/app.js" defer></script>
-
-    <!-- Bootstrap -->
-    <script src="js/bootstrap.bundle.min.js" defer></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/app.js" defer></script>
 
     <!-- Font awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -19,36 +19,53 @@
 </head>
 <body>
     <!-- mb= margin bottom mt margin top mx margin horizontal my margin vertical -->
-    <div class="header">
-        <div class="header_teste">
-            <div>oi</div>
-            <div>odi</div>
-            <div>oi</div>
-            <div>oi</div>
-        </div>
-        <div class="toggle-light">
-            Teste
-        </div>
+    <!-- <div id="teste">
+        <i class="fa-solid fa-moon"></i>
+        <i class="fa-solid fa-sun"></i>
+    </div> -->
+    <div class="toggle" id="mode_toggle">
+        <div class="ball"></div>
     </div>
-    <div class="container mt-5 col-12 col-md-6 testv">
+    <div class="container mt-5 col-12 col-md-6">
         <h1 class="text-center mb-4">Minha lista de tarefas</h1>
-        <div class="input-group mb-3">
+
+        <div class="input-group mb-3" id="todo-form">
             <input type="text" id="container_input" class="form-control" placeholder="Digite uma nova tarefa...">
             <button class="btn btn-primary" id="container_button" type="submit">Adicionar</button>
         </div>
 
+        <!-- Editar tarefa -->
+        <div class="col-12 mb-3 hide container-3d" id="edit-task">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Edite a sua tarefa:</h5>
+                    <p class="card-text mb-3">PARAGRAPH</p>
+                    <div class="input-group d-flex">
+                        <input type="text" class="form-control" id="edit-input">
+                        <button id="confirmEditBtn" class="input-group-button btn btn-primary rounded-right">Editar</button>
+                        <button id="cancel-edit" class="input-group-button btn btn-secondary ms-2 rounded">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de tarefas -->
         <ul class="list-group" id="container_task-list">
             <div class="empty_tasks">
-                <img src="assets/empty_tasks.png">
+                <img src="assets/images/empty_tasks.png">
+                <h5>Ainda não há tarefas adicionadas.</h5>
             </div>
         </ul>
+
     </div>
     <footer class="footer">
         <div class="footer-content">
-            <p class="test1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla similique animi, libero repellat facilis dignissimos, in illum rem minus praesentium eum rerum odio cum deleniti ducimus consequatur maxime qui asperiores.</p>
+            <!-- Boa ideia: projetar sites no Figma antes de passar para o trabalho -->
+            <a href="https://www.linkedin.com/in/davimrqs/"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="https://github.com/davimrqs"><i class="fa-brands fa-github"></i></a>
         </div>
         <div class="footer-bottom">
-            <p class="test2">Desenvolvido por: </p>
+            <p class="test2">Projeto codificado utilizando <a class="footer_link" href="https://code.visualstudio.com" target="_blank">Visual Studio Code</a>. Construído com o <a class="footer_link" href="https://getbootstrap.com">Bootstrap</a>, implantado pelo <a class="footer_link" href="https://vercel.com">Vercel</a>.</p>
         </div>
     </footer>
     
