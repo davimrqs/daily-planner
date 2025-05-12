@@ -1,9 +1,12 @@
 //Variáveis
 //percebi que não estava praticando boas práticas no quesito nomenclatura das variáveis
-let character_limit = 100;
 let toggle_night_mode = false;
 let oldInputValue;
 let taskToRemove;
+let confirmTaskToRemove;
+
+
+const limitCharacters = 1;
 
 // Seleção de elementos
 const darkmode = localStorage.getItem('darkmode');
@@ -21,6 +24,14 @@ const task_input = document.getElementById("container_input");
 const addtask_button = document.getElementById("container_button");
 
 const taskList = document.getElementById("container_task-list");
+const lenghtWarning = document.querySelector('.alert');
+
+//Projeto de armazenar todas as tarefas no LocalStorage
+//O localstorage armazena apenas strings
+//-> pra colocar algo nele é apenas sendo uma string *stringfy
+//-> quando sai dele, é uma string, sendo assim tendo que transformar em um objeto novamente *parse
+
+
 
 // Leitura de evento de quando você aperta a tecla Enter(13) estando no Input adicionar a tarefa à lista
 task_input.addEventListener('keyup', function (event){
@@ -42,10 +53,9 @@ const emptyMessage = document.querySelector('.empty_tasks');
 // Funções
 function toggleForm() {
     edit_task.classList.toggle('hide');
-    
-
     todo_form.classList.toggle('hide');
     taskList.classList.toggle('hide');
+    console.log('sumir formulario de switch');
 }
 function confirmDelete() {
     // Criação do modal
@@ -68,7 +78,7 @@ function confirmDelete() {
     modalHeader.classList.add('modal-header');
     const modalTitle = document.createElement('h5');
     modalTitle.classList.add('modal-title');
-    modalTitle.innerText = 'Título';
+    modalTitle.innerText = 'Você tem certeza desta ação?';
     modalHeader.appendChild(modalTitle);
     //Botão Xis
     modalContent.appendChild(modalHeader);
@@ -87,12 +97,25 @@ function confirmDelete() {
     const closeBtn = document.createElement('button');
     closeBtn.classList.add('btn', 'btn-secondary');
     closeBtn.innerText = 'Cancel';
+
     modalFooter.appendChild(closeBtn);
     const confirmBtn = document.createElement('button');
     confirmBtn.classList.add('btn', 'btn-primary');
     confirmBtn.innerText = 'Save changes';
     modalFooter.appendChild(confirmBtn);
     modalContent.appendChild(modalFooter);
+
+    confirmBtn.addEventListener('click', function (){
+        task_list.querySelectorAll('.task').forEach(function (task){
+            if (task == confirmTaskToRemove){
+                task_list.removeChild(task);
+                myModal.hide();
+                if (task_list.querySelectorAll('.task').length == 0) {
+                    task_list.appendChild(emptyMessage);
+                }
+            }
+        });
+    });
 
     document.body.appendChild(modal);
 
@@ -103,6 +126,10 @@ function confirmDelete() {
 
     // Exibindo o modal
     myModal.show();
+
+    closeBtn.addEventListener('click', function(){
+        myModal.hide();
+    });
 
 }
 function createTask(text) {
@@ -152,6 +179,7 @@ function createTask(text) {
                 task_list.appendChild(emptyMessage);
             }
         }else{
+            confirmTaskToRemove = this.parentElement;
             confirmDelete();
         }
     });
@@ -178,9 +206,9 @@ function updateTodo(text){
         if (todo.querySelector('h3').innerText == oldInputValue){
             todo.querySelector('h3').innerHTML = text;
         }
-
-        toggleForm();
+        //O erro estava ocorrendo porque o toggleForm ativava na quantidade de elementos que o forEach percorria
     });
+    toggleForm();
 }
 function enableNightMode() {
     // O toggle_night_mode está true, logo virando false -> ficando no modo noturno
@@ -213,22 +241,42 @@ night_mode_btn.addEventListener('click', function () {
     }
 });
 
-addtask_button.addEventListener('click', function() {
+addtask_button.addEventListener('click', function(e) {
     const task_text = task_input.value.trim();
-    if (task_text){
-        if (task_list.querySelectorAll('.task').length == 0) {
-            task_list.removeChild(emptyMessage);
+    if (task_text.length <= limitCharacters){
+        if (task_text){
+            if (task_list.querySelectorAll('.task').length == 0) {
+                task_list.removeChild(emptyMessage);
+            }
+            createTask(task_text);
+        }else{
+            addtask_button.classList.add('error');
+            setTimeout(function() {
+                addtask_button.classList.remove('error');
+            }, 250);
         }
-        createTask(task_text);
     }else{
-        addtask_button.classList.add('error');
-        setTimeout(function() {
-            addtask_button.classList.remove('error');
-        }, 250);
+        task_input.value = "";
+        document.querySelector(".alert").animate([{transform: "scale(0)", opacity: 0},{transform: "scale(1)", opacity: 1}],{duration: 500,iterations: 1,easing: "ease"});
+        lenghtWarning.classList.toggle('hide');
+        setTimeout(function(){
+            document.querySelector(".alert").animate([{transform: "scale(1)", opacity: 1},{transform: "scale(0)", opacity: 0}],{duration: 500,iterations: 1,easing: "ease"});
+        }, 1750);
+        setTimeout(function(){
+            lenghtWarning.classList.toggle('hide');
+        }, 2000);
     }
 });
 
+
 //Clica no botão de alterar tarefa
+edit_input.addEventListener('keyup', function (e){
+    if (e.keyCode == 13) {
+        e.preventDefault();
+        document.getElementById('confirmEditBtn').click();   
+    }
+});
+
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('edit')){
         
@@ -237,13 +285,14 @@ document.addEventListener('click', function(e) {
         
         let todoTitle;
         
-        document.querySelector('.card').style.animation = "openEditTaskCard .5s linear";
+        document.getElementById("edit-task").animate([{transform: "rotateY(90deg)", offset: 0},{transform: "rotateY(45deg)", offset: 0.5},{transform: "rotateY(0deg)", offset: 1}],{duration: 500,iterations: 1,easing: "ease"});
 
         todoTitle = parent.querySelector('h3').textContent;
         edit_input.value = todoTitle;
         oldInputValue = todoTitle;
 
         toggleForm()
+        edit_input.focus();
     }
 });
 
@@ -262,8 +311,9 @@ confirmEditBtn.addEventListener('click', function (e) {
 
 cancel_edit.addEventListener('click', function(e) {
      if (!edit_task.classList.contains('hide')){
-         console.log('teste');
-         document.querySelector('.card').style.animation = "closeEditTaskCard .5s linear";
+        document.getElementById("edit-task").animate([{transform: "rotateY(0deg)", offset: 0},{transform: "rotateY(45deg)", offset: 0.5},{transform: "rotateY(90deg)", offset: 1}],{duration: 500,iterations: 1,easing: "ease"});
      }
-    toggleForm();
+     setTimeout(function () {
+        toggleForm();
+     }, 350);
 });

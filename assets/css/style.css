@@ -12,6 +12,9 @@ body {
 }
 
 /* Sem lugar definido */
+.alert {
+    
+}
 .hide {
     display: none;
 }
@@ -44,7 +47,7 @@ body {
     background-color: #333;
 }
 
-.night-mode .footer {
+.night-mode footer {
     background-color: #333333;
 }
 
@@ -119,18 +122,10 @@ body {
 
 /* Cabeçalho e rodapé */
 
-.footer {
+footer {
     background-color: #e0e0e0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 10rem;
-    width: 100%;
-    gap: 50%;
-    box-sizing: border-box;
-    margin-top: 5%;
-    padding: 5rem 10em 5em;
 }
+
 .footer-content {
     display: flex;
     gap: 1rem;
@@ -150,6 +145,7 @@ body {
     border-top: 1px solid rgba(17, 0, 255, 0.1);
     color: #333333;
     font-weight: 300;
+    width: 35%;
 }
 
 /* Imagem e texto de quando não tem tarefas adicionadas */
@@ -289,6 +285,7 @@ body {
         background-color: transparent;
     }
 }
+
 .input-group button.error {
     animation: error 1s ease;
     box-sizing: border-box;
@@ -307,7 +304,14 @@ button i {
     /* Usuário clica no botão e não no ícone */
     pointer-events: none;
 }
-
+@media only screen and (max-width: 700px){
+    .footer-content {
+        display: none;
+    }
+    .footer-bottom {
+        width: 100%;
+    }
+}
 /* Responsividade com outros dispositivos */
 /* @media only screen and (max-width: 712px) {
     classe {
