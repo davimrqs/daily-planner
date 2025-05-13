@@ -241,8 +241,8 @@ function updateTodo(text){
     const todos = document.querySelectorAll('.todo');
     //Trocar o 'forEach' pelo método 'some' aí resolveria o problema do toggleForm ativar no final da função 'updateTodo'
     todos.forEach(function (todo){
-        if (todo.length <= limitCharacters){
-            if (todo.querySelector('h3').innerText == oldInputValue){
+        if (todo.querySelector('h3').innerText == oldInputValue){
+            if (todo.querySelector('h3').textContent.length <= limitCharacters){
                 todo.querySelector('h3').innerHTML = text;
             }
         }else{
