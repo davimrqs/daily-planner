@@ -6,7 +6,7 @@ let taskToRemove;
 let confirmTaskToRemove;
 let tasks = [];
 
-const limitCharacters = 1;
+const limitCharacters = 50;
 
 // Seleção de elementos
 const darkmode = localStorage.getItem('darkmode');
