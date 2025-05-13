@@ -4,7 +4,7 @@ let toggle_night_mode = false;
 let oldInputValue;
 let taskToRemove;
 let confirmTaskToRemove;
-
+let tasks = [];
 
 const limitCharacters = 1;
 
@@ -26,20 +26,6 @@ const addtask_button = document.getElementById("container_button");
 const taskList = document.getElementById("container_task-list");
 const lenghtWarning = document.querySelector('.alert');
 
-//Projeto de armazenar todas as tarefas no LocalStorage
-//O localstorage armazena apenas strings
-//-> pra colocar algo nele é apenas sendo uma string *stringfy
-//-> quando sai dele, é uma string, sendo assim tendo que transformar em um objeto novamente *parse
-
-
-
-// Leitura de evento de quando você aperta a tecla Enter(13) estando no Input adicionar a tarefa à lista
-task_input.addEventListener('keyup', function (event){
-    if (event.keyCode === 13) { //número do enter
-        addtask_button.click();
-    }
-});
-
 const task_list = document.getElementById("container_task-list");
 
 const no_tasks = document.getElementById("empty_tasks_img");
@@ -47,16 +33,51 @@ const no_tasks = document.getElementById("empty_tasks_img");
 const finishTask = document.getElementById("finish-todo");
 const teste = document.querySelector('.finish-todo');
 
-// Para quando eu remover quando adicionar uma tarefa ele ainda vai estar armazenado nessa variável constante
-const emptyMessage = document.querySelector('.empty_tasks');
+loadTasks();
 
-// Funções
+// Funções (1/2) Responsável parcialmente pelo LocalStore
+function aaa() {
+    console.log(tasks);
+}
+function addEmptyImage() {
+    const pai = document.createElement('div');
+    pai.classList.add('empty_tasks');
+    const img = document.createElement('img');
+    img.setAttribute('src', 'assets/images/empty_tasks.png');
+    const h5 = document.createElement('h5');
+    h5.textContent = 'Ainda não há tarefas adicionadas.';
+    pai.appendChild(img);
+    pai.appendChild(h5);
+    task_list.appendChild(pai);
+}
+function removeEmptyMessage(){
+    task_list.removeChild(task_list.querySelector('.empty_tasks'));
+}
+
+function saveTasks() {
+    const tasksToSave = JSON.stringify(tasks);
+    localStorage.setItem('tarefas', tasksToSave);
+}
+function loadTasks() {
+    const tasksToLoad = JSON.parse(localStorage.getItem('tarefas')) || [];
+    tasks = tasksToLoad;
+    if (tasks.length > 0){    
+        tasksToLoad.forEach(function(item){
+            createTask(item);
+        });
+    }else{
+        addEmptyImage();
+    }
+
+}
+
+//Funções (2/2)
 function toggleForm() {
     edit_task.classList.toggle('hide');
     todo_form.classList.toggle('hide');
     taskList.classList.toggle('hide');
-    console.log('sumir formulario de switch');
 }
+
 function confirmDelete() {
     // Criação do modal
     const modal = document.createElement('div');
@@ -87,7 +108,7 @@ function confirmDelete() {
     const modalBody = document.createElement('div');
     modalBody.classList.add('modal-body');
     const bodyText = document.createElement('p');
-    bodyText.innerText = 'Modal body text goes here.';
+    bodyText.innerText = 'A exclusão da tarefa é irreversível. Deseja continuar?';
     modalBody.appendChild(bodyText);
     modalContent.appendChild(modalBody);
     
@@ -96,23 +117,32 @@ function confirmDelete() {
     modalFooter.classList.add('modal-footer');
     const closeBtn = document.createElement('button');
     closeBtn.classList.add('btn', 'btn-secondary');
-    closeBtn.innerText = 'Cancel';
+    closeBtn.innerText = 'Cancelar';
 
     modalFooter.appendChild(closeBtn);
     const confirmBtn = document.createElement('button');
     confirmBtn.classList.add('btn', 'btn-primary');
-    confirmBtn.innerText = 'Save changes';
+    confirmBtn.innerText = 'Salvar mudanças';
     modalFooter.appendChild(confirmBtn);
     modalContent.appendChild(modalFooter);
 
     confirmBtn.addEventListener('click', function (){
         task_list.querySelectorAll('.task').forEach(function (task){
             if (task == confirmTaskToRemove){
+                tasks.forEach(function(item, indice){
+                    console.log(item, task.querySelector('h3').textContent);
+                    if (item === task.querySelector('h3').textContent){
+                        // Índice de onde a remoção(ou inserção) vai começar
+                        // e quantos elementos você quer remover a partir desse índice
+                        tasks.splice(indice, 1);
+                    }
+                });
                 task_list.removeChild(task);
                 myModal.hide();
                 if (task_list.querySelectorAll('.task').length == 0) {
-                    task_list.appendChild(emptyMessage);
+                    addEmptyImage();
                 }
+                saveTasks();
             }
         });
     });
@@ -130,7 +160,6 @@ function confirmDelete() {
     closeBtn.addEventListener('click', function(){
         myModal.hide();
     });
-
 }
 function createTask(text) {
     // Cria o pai
@@ -139,7 +168,7 @@ function createTask(text) {
 
     // Cria o elemento filho que contém o texto da tarefa
     const task_text = document.createElement('h3');
-    task_text.textContent = text;
+    task_text.textContent = text.trim() ;
 
     // Cria o botão de finalizar
     const finish = document.createElement('button');
@@ -174,9 +203,20 @@ function createTask(text) {
     // Voltar aqui
     remove.addEventListener('click', function (){
         if (this.parentElement.classList.contains('finished')){
+            pai = this.parentElement;
+            tasks.forEach(function(item, indice){
+                // ESTOU AQUI
+                if (item === pai.querySelector('h3').textContent){
+                    // Índice de onde a remoção(ou inserção) vai começar
+                    // e quantos elementos você quer remover a partir desse índice
+                    tasks.splice(indice, 1);
+                    saveTasks();
+                    console.log('oi');
+                }
+            });
             this.parentElement.remove();
             if (task_list.querySelectorAll('.task').length == 0) {
-                task_list.appendChild(emptyMessage);
+                addEmptyImage();
             }
         }else{
             confirmTaskToRemove = this.parentElement;
@@ -195,16 +235,25 @@ function createTask(text) {
     new_element.appendChild(remove);
 
     document.getElementById("container_task-list").appendChild(new_element);
-    task_input.value = '';
-    task_input.focus();
 }
 
 function updateTodo(text){
     const todos = document.querySelectorAll('.todo');
-
+    //Trocar o 'forEach' pelo método 'some' aí resolveria o problema do toggleForm ativar no final da função 'updateTodo'
     todos.forEach(function (todo){
-        if (todo.querySelector('h3').innerText == oldInputValue){
-            todo.querySelector('h3').innerHTML = text;
+        if (todo.length <= limitCharacters){
+            if (todo.querySelector('h3').innerText == oldInputValue){
+                todo.querySelector('h3').innerHTML = text;
+            }
+        }else{
+            document.querySelector(".alert").animate([{transform: "scale(0)", opacity: 0},{transform: "scale(1)", opacity: 1}],{duration: 500,iterations: 1,easing: "ease"});
+            lenghtWarning.classList.toggle('hide');
+            setTimeout(function(){
+                document.querySelector(".alert").animate([{transform: "scale(1)", opacity: 1},{transform: "scale(0)", opacity: 0}],{duration: 500,iterations: 1,easing: "ease"});
+            }, 1750);
+            setTimeout(function(){
+                lenghtWarning.classList.toggle('hide');
+            }, 2000);
         }
         //O erro estava ocorrendo porque o toggleForm ativava na quantidade de elementos que o forEach percorria
     });
@@ -246,9 +295,13 @@ addtask_button.addEventListener('click', function(e) {
     if (task_text.length <= limitCharacters){
         if (task_text){
             if (task_list.querySelectorAll('.task').length == 0) {
-                task_list.removeChild(emptyMessage);
+                removeEmptyMessage();
             }
             createTask(task_text);
+            task_input.value = '';
+            task_input.focus();
+            tasks.push(task_text.trim());
+            saveTasks();
         }else{
             addtask_button.classList.add('error');
             setTimeout(function() {
@@ -276,6 +329,11 @@ edit_input.addEventListener('keyup', function (e){
         document.getElementById('confirmEditBtn').click();   
     }
 });
+task_input.addEventListener('keyup', function (event){
+    if (event.keyCode === 13) { //número do enter
+        addtask_button.click();
+    }
+});
 
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('edit')){
@@ -300,8 +358,6 @@ document.addEventListener('click', function(e) {
 //edit_task = div pai
 confirmEditBtn.addEventListener('click', function (e) {
     e.preventDefault();
-
-    console.log('confirm edit button');
     const editTaskValue = edit_input.value;
 
     if (editTaskValue){
