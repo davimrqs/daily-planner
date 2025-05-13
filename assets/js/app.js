@@ -168,25 +168,25 @@ function createTask(text) {
 
     // Cria o elemento filho que contém o texto da tarefa
     const task_text = document.createElement('h3');
-    task_text.textContent = text.trim() ;
+    task_text.textContent = text.trim();
 
     // Cria o botão de finalizar
     const finish = document.createElement('button');
     const icon = document.createElement('i');
-    icon.classList.add('fa-solid', 'fa-check', 'done');
+    icon.classList.add('fa-solid', 'fa-check', 'done', 'px-1');
     finish.appendChild(icon);
 
     // Cria o botão de excluir
     const remove = document.createElement('button');
     const icon2 = document.createElement('i');
-    icon2.classList.add('fa-solid', 'fa-trash', 'remove');
+    icon2.classList.add('fa-solid', 'fa-trash', 'remove', 'px-1');
     remove.appendChild(icon2);
 
     // Cria o botão de edição
     const edit = document.createElement('button');
     edit.classList.add('edit');
     const icon3 = document.createElement('i');
-    icon3.classList.add('fa-solid', 'fa-gear');
+    icon3.classList.add('fa-solid', 'fa-gear', 'px-1');
     edit.appendChild(icon3);
 
     finish.addEventListener('click', function() {
@@ -242,18 +242,21 @@ function updateTodo(text){
     //Trocar o 'forEach' pelo método 'some' aí resolveria o problema do toggleForm ativar no final da função 'updateTodo'
     todos.forEach(function (todo){
         if (todo.querySelector('h3').innerText == oldInputValue){
-            if (todo.querySelector('h3').textContent.length <= limitCharacters){
+            if (todo.querySelector('h3').textContent.length <= limitCharacters && text.length <= limitCharacters){
                 todo.querySelector('h3').innerHTML = text;
-            }
-        }else{
-            document.querySelector(".alert").animate([{transform: "scale(0)", opacity: 0},{transform: "scale(1)", opacity: 1}],{duration: 500,iterations: 1,easing: "ease"});
-            lenghtWarning.classList.toggle('hide');
-            setTimeout(function(){
-                document.querySelector(".alert").animate([{transform: "scale(1)", opacity: 1},{transform: "scale(0)", opacity: 0}],{duration: 500,iterations: 1,easing: "ease"});
-            }, 1750);
-            setTimeout(function(){
+            }else{
+                if (text.length > limitCharacters) {
+                    lenghtWarning.querySelector('span').innerText = 'O nome de uma tarefa deve conter no máximo 50 caracteres.';
+                }
+                document.querySelector(".alert").animate([{transform: "scale(0)", opacity: 0},{transform: "scale(1)", opacity: 1}],{duration: 500,iterations: 1,easing: "ease"});
                 lenghtWarning.classList.toggle('hide');
-            }, 2000);
+                setTimeout(function(){
+                    document.querySelector(".alert").animate([{transform: "scale(1)", opacity: 1},{transform: "scale(0)", opacity: 0}],{duration: 500,iterations: 1,easing: "ease"});
+                }, 1750);
+                setTimeout(function(){
+                    lenghtWarning.classList.toggle('hide');
+                }, 2000);
+            }
         }
         //O erro estava ocorrendo porque o toggleForm ativava na quantidade de elementos que o forEach percorria
     });
@@ -310,6 +313,7 @@ addtask_button.addEventListener('click', function(e) {
         }
     }else{
         task_input.value = "";
+        lenghtWarning.querySelector('span').innerText = 'Sua tarefa deve conter no máximo 50 caracteres.';
         document.querySelector(".alert").animate([{transform: "scale(0)", opacity: 0},{transform: "scale(1)", opacity: 1}],{duration: 500,iterations: 1,easing: "ease"});
         lenghtWarning.classList.toggle('hide');
         setTimeout(function(){
